@@ -22,11 +22,13 @@ pcApprox = function(x, npc) {
   # Perform PCA
   pca = prcomp(x, scale. = TRUE, center = TRUE)
 
-  # Use the first npc principal components to project and reconstruct the data
-  x_rotated = pca$x[, 1:npc] %*% t(pca$rotation[, 1:npc])
+  # Reconstruction using the selected number of PCs
+  x_rotated = pca$x[, 1:npc, drop = FALSE] %*% t(pca$rotation[, 1:npc, drop = FALSE])
 
-  # Rescale and recenter the approximation to match the original data
-  approx_data = scale(x_rotated, center = -pca$center, scale = FALSE) * pca$scale + pca$center
+  # Correctly reverse the scaling and centering
+  approx_data = x_rotated
+  approx_data = sweep(approx_data, 2, pca$scale, FUN="*")
+  approx_data = sweep(approx_data, 2, pca$center, FUN="+")
 
   return(approx_data)
 }

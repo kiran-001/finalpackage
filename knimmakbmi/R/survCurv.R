@@ -20,8 +20,14 @@ if (getRversion() >= "3.5.0") {
 #' data <- read.csv("https://jlucasmckay.bmi.emory.edu/global/bmi510/Labs-Materials/survival.csv")
 #' survCurv(data$status, data$time)
 #' @export
-survCurv <- function(status, time) {
-  data <- tibble(time = time, status = status) %>%
+survCurv = function(status, time) {
+  if (!is.vector(time) || !is.numeric(time)) {
+    stop("The 'time' parameter should be a numeric vector.")
+  }
+  if (!is.vector(status) || !is.numeric(status)) {
+    stop("The 'status' parameter should be a numeric vector.")
+  }
+  data = tibble(time = time, status = status) %>%
     arrange(time) %>%
     group_by(time) %>%
     summarise(events = sum(status), n_risk = n(), .groups = 'drop') %>%

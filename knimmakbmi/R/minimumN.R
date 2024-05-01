@@ -15,6 +15,10 @@
 #' minimumN(sample1, sample2)  # Two-sample t-test
 #' @export
 minimumN = function(x1, x2 = NULL) {
+  if (!is.numeric(x1) || (!is.null(x2) && !is.numeric(x2))) {
+    stop("Both inputs must be numeric vectors.")
+  }
+
   if (!requireNamespace("pwr", quietly = TRUE)) {
     stop("Please install the 'pwr' package.")
   }

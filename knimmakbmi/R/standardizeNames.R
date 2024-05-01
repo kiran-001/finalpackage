@@ -13,6 +13,10 @@
 #' standardized_data = standardizeNames(data)
 #' @export
 standardizeNames = function(data) {
+  if (!inherits(data, "tbl_df")) {
+    stop("input must be a tibble")
+  }
+
   if (!requireNamespace("dplyr", quietly = TRUE) ||
       !requireNamespace("janitor", quietly = TRUE) ||
       !requireNamespace("snakecase", quietly = TRUE)) {

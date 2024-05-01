@@ -7,6 +7,9 @@
 #' data = c(1, 0, 0, 0, 1, 1, 1)
 #' logLikBernoulli(data)
 logLikBernoulli = function(data) {
+  if (length(data) == 0) {
+    stop("Input data vector is empty")
+  }
   best_p = NULL
   max_logLik = -Inf
   for (p in seq(0, 1, by = 0.001)) {

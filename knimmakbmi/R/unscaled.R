@@ -17,11 +17,23 @@ unscale = function(x) {
     stop("Input must be a numeric vector.")
   }
 
-  # Check if 'x' has the necessary attributes
-  if (!is.null(attr(x, "scaled:center")) && !is.null(attr(x, "scaled:scale"))) {
-    center = attr(x, "scaled:center")
-    scale = attr(x, "scaled:scale")
-    unscaled = x * scale + center
+  # Retrieve the center and scale attributes
+  center = attr(x, "scaled:center")
+  scale = attr(x, "scaled:scale")
+
+  # Check if attributes exist
+  if (!is.null(center) && !is.null(scale)) {
+    if (any(is.nan(scale))) {  # Check for NaN scale
+      # Return a vector of the center value repeated
+      unscaled = rep(center, length(x))
+    } else {
+      # Perform the normal unscaling operation
+      unscaled = x * scale + center
+      # Convert matrix to vector if needed
+      if (is.matrix(unscaled) && ncol(unscaled) == 1) {
+        unscaled = as.vector(unscaled)
+      }
+    }
   } else {
     stop("The input vector does not have scaling attributes.")
   }
