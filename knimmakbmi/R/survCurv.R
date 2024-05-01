@@ -14,30 +14,41 @@ if (getRversion() >= "3.5.0") {
 #' @importFrom dplyr filter arrange summarise mutate group_by ungroup n lag first
 #' @importFrom tibble tibble
 #' @importFrom ggplot2 ggplot geom_step labs theme_minimal aes
+#' @import survival
 #' @importFrom magrittr %>%
 #' @return A ggplot object showing the survival curve.
 #' @examples
-#' data <- read.csv("https://jlucasmckay.bmi.emory.edu/global/bmi510/Labs-Materials/survival.csv")
+#' data = read.csv("https://jlucasmckay.bmi.emory.edu/global/bmi510/Labs-Materials/survival.csv")
 #' survCurv(data$status, data$time)
 #' @export
 survCurv = function(status, time) {
+  # Ensure the input is correct
   if (!is.vector(time) || !is.numeric(time)) {
     stop("The 'time' parameter should be a numeric vector.")
   }
   if (!is.vector(status) || !is.numeric(status)) {
     stop("The 'status' parameter should be a numeric vector.")
   }
-  data = tibble(time = time, status = status) %>%
-    arrange(time) %>%
-    group_by(time) %>%
-    summarise(events = sum(status), n_risk = n(), .groups = 'drop') %>%
-    mutate(at_risk = lag(cumsum(n_risk), default = first(n_risk)) - lag(cumsum(events), default = 0),
-           surv_prob = 1 - events / at_risk) %>%
-    mutate(surv_prob = cumprod(surv_prob))
 
-  # Plot the survival curve
-  ggplot(data, aes(x = time, y = surv_prob)) +
+  # Filter out negative time values
+  data = tibble(time = time, status = status) %>%
+    filter(time >= 0)
+
+  # Create a survival object
+  surv_object = Surv(data$time, data$status)
+
+  # Calculate survival estimates using the Kaplan-Meier method
+  surv_fit = survfit(surv_object ~ 1)
+
+  # Convert survival fit to data frame for ggplot
+  surv_df = data.frame(
+    time = surv_fit$time,
+    surv_prob = surv_fit$surv
+  )
+
+  # Plot the survival curve using ggplot2
+  ggplot(surv_df, aes(x = time, y = surv_prob)) +
     geom_step() +
-    labs(title = "Survival Curve", x = "Time", y = "Survival Probability") +
+    labs(title = "Kaplan-Meier Survival Curve", x = "Time", y = "Survival Probability") +
     theme_minimal()
 }

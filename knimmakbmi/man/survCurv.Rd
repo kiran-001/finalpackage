@@ -20,6 +20,6 @@ and calculates and plots a survival curve using a step function. It does not use
 survival analysis packages, and computes the Kaplan-Meier estimator manually.
 }
 \examples{
-data <- read.csv("https://jlucasmckay.bmi.emory.edu/global/bmi510/Labs-Materials/survival.csv")
+data = read.csv("https://jlucasmckay.bmi.emory.edu/global/bmi510/Labs-Materials/survival.csv")
 survCurv(data$status, data$time)
 }
